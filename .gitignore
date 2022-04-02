@@ -1,2 +1,2 @@
-*.json
 *.log
+tests/outputs/*.txt
