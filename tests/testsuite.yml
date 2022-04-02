@@ -1,0 +1,74 @@
+name: Exec testsuite
+
+testcases:
+- name: init
+  steps:
+
+- name: wrong options
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . 
+    assertions:
+    - result.code ShouldEqual 1
+
+- name: wrong options e and d 
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/inputs/input.txt -e -d -o tests/outputs/wrong.txt -k tests/inputs/wrongkey.txt
+    assertions:
+    - result.code ShouldEqual 1
+
+- name: encrypt a file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: encrypt a file AES256
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted-AES256.txt  -k tests/inputs/key-AES256.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between crypted files in AES256 and AES128
+  steps:
+  - type: exec
+    script: |
+      diff -q tests/outputs/crypted.txt tests/outputs/crypted-AES256.txt
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: diff between input and crypted file
+  steps:
+  - type: exec
+    script: |
+      diff -q tests/inputs/input.txt tests/outputs/crypted.txt
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: decrypt file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/outputs/crypted.txt -d -o tests/outputs/decrypted.txt  -k tests/inputs/key-AES128.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      diff -q inputs/input.txt outputs/decrypted.txt
+    assertions:
+    - result.code ShouldEqual 0
