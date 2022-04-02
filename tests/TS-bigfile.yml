@@ -1,0 +1,44 @@
+name: Exec testsuite
+
+testcases:
+- name: create big file 5G
+  steps:
+  - type: exec
+    script: |
+      dd if=/dev/urandom of=inputs/BIG count=5000 bs=1024000
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: encrypt big file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/inputs/BIG -e -o tests/outputs/crypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff
+  steps:
+  - type: exec
+    script: |
+      diff -q tests/inputs/BIG tests/outputs/crypted-BIG-AES512.txt
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: decrypt file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/outputs/crypted-BIG-AES512.txt -d -o tests/outputs/decrypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      diff -q inputs/BIG outputs/decrypted-BIG-AES512.txt
+    assertions:
+    - result.code ShouldEqual 0
