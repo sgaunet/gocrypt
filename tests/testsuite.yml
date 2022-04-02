@@ -69,6 +69,6 @@ testcases:
   steps:
   - type: exec
     script: |
-      diff -q tests/inputs/input.txt tests/outputs/decrypted.txt
+      diff -q inputs/input.txt outputs/decrypted.txt
     assertions:
-    - result.code ShouldNotEqual 0
+    - result.code ShouldEqual 0
