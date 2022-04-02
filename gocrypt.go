@@ -3,15 +3,18 @@ package main
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 )
+
+// (128, 192, or 256 bits // 8 bits= one character)
+const KEY_LENGTH_AES128 = 16
+const KEY_LENGTH_AES256 = 24
+const KEY_LENGTH_AES512 = 32
 
 func main() {
 	var inputFile, outputFile string
@@ -32,8 +35,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if encryptOption && decryptOption {
-		fmt.Fprintf(os.Stderr, "cannot get two options encrypt and decrypt at the same time")
+	if (encryptOption && decryptOption) || (!encryptOption && !decryptOption) {
+		fmt.Fprintf(os.Stderr, "choose only one option between encrypt and decrypt")
 		os.Exit(1)
 	}
 
@@ -53,7 +56,6 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Cannot remove file %s\n", outputFile)
 			os.Exit(1)
 		}
-
 	}
 
 	key, err := getKey(keyFile)
@@ -87,76 +89,67 @@ func getKey(keyFilename string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(key) != 16 && len(key) != 32 && len(key) != 64 {
-		return nil, errors.New("length of key should be 16, 32 or 64 if you want to ctypt in AES-128, AES-256 or AES-512")
+	if len(key) != KEY_LENGTH_AES128 && len(key) != KEY_LENGTH_AES256 && len(key) != KEY_LENGTH_AES512 {
+		return nil, errors.New("length of key should be 16, 24 or 32 characters if you want to respectively encrypt in AES-128, AES-256 or AES-512")
 	}
 
 	return key, err
 }
 
 func encryptFile(key []byte, inputFile string, outputFile string) error {
-	// Reading plaintext file
-	plainText, err := ioutil.ReadFile(inputFile)
-	if err != nil {
-		return err
-	}
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err
 	}
-	// Creating GCM mode
-	gcm, err := cipher.NewGCM(block)
+	reader, err := os.Open(inputFile)
 	if err != nil {
-		return errors.New("cipher GCM err: " + err.Error())
+		return err
 	}
-	// Generating random nonce
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		log.Fatalf("nonce  err: %v", err.Error())
-	}
+	defer reader.Close()
 
-	cipherText := gcm.Seal(nonce, nonce, plainText, nil)
-
-	// Writing ciphertext file
-	err = ioutil.WriteFile(outputFile, cipherText, 0600)
+	writer, err := os.Create(outputFile)
 	if err != nil {
-		return errors.New("write file err: " + err.Error())
+		return err
+	}
+	defer writer.Close()
+
+	iv := make([]byte, aes.BlockSize)
+	stream := cipher.NewOFB(block, iv[:])
+	cipherWriter := &cipher.StreamWriter{
+		S: stream,
+		W: writer,
+	}
+	if _, err = io.Copy(cipherWriter, reader); err != nil {
+		return err
 	}
 	return nil
 }
 
 func decryptFile(key []byte, inputFile string, outputFile string) error {
-	// Reading ciphertext file
-	cipherText, err := ioutil.ReadFile(inputFile)
-	if err != nil {
-		return err
-	}
-
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return errors.New("cipher err: " + err.Error())
 	}
-
-	// Creating GCM mode
-	gcm, err := cipher.NewGCM(block)
+	reader, err := os.Open(inputFile)
 	if err != nil {
-		return errors.New("cipher GCM err: " + err.Error())
+		return err
+	}
+	defer reader.Close()
+
+	f, err := os.Create(outputFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	iv := make([]byte, aes.BlockSize)
+	stream := cipher.NewOFB(block, iv[:])
+	cipherReader := &cipher.StreamReader{S: stream, R: reader}
+	if _, err = io.Copy(f, cipherReader); err != nil {
+		return err
 	}
 
-	// Deattached nonce and decrypt
-	nonce := cipherText[:gcm.NonceSize()]
-	cipherText = cipherText[gcm.NonceSize():]
-	plainText, err := gcm.Open(nil, nonce, cipherText, nil)
-	if err != nil {
-		return errors.New("decrypt file err: " + err.Error())
-	}
-
-	// Writing decryption content
-	err = ioutil.WriteFile(outputFile, plainText, 0600)
-	if err != nil {
-		return errors.New("write file err: " + err.Error())
-	}
 	return nil
 }
