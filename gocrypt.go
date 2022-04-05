@@ -6,19 +6,31 @@ import (
 	"os"
 )
 
+var version string = "development"
+
+func printVersion() {
+	fmt.Println(version)
+}
+
 func main() {
 	var inputFile, outputFile string
 	var keyFile string
-	var helpOption, encryptOption, decryptOption bool
+	var helpOption, encryptOption, decryptOption, vOption bool
 	var err error
 
 	flag.StringVar(&inputFile, "i", "", "File to encrypt/decrypt")
 	flag.StringVar(&outputFile, "o", "", "Output file")
 	flag.StringVar(&keyFile, "k", "", "Name of file containing the key")
-	flag.BoolVar(&encryptOption, "e", false, "encrypt option")
-	flag.BoolVar(&decryptOption, "d", false, "decrypt option")
+	flag.BoolVar(&encryptOption, "e", false, "Encrypt option")
+	flag.BoolVar(&decryptOption, "d", false, "Decrypt option")
+	flag.BoolVar(&vOption, "v", false, "Get version")
 	flag.BoolVar(&helpOption, "h", false, "Print help")
 	flag.Parse()
+
+	if vOption {
+		printVersion()
+		os.Exit(0)
+	}
 
 	if inputFile == "" || outputFile == "" || keyFile == "" {
 		flag.PrintDefaults()
