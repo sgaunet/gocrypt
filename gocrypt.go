@@ -15,7 +15,7 @@ func printVersion() {
 func main() {
 	var inputFile, outputFile string
 	var keyFile string
-	var helpOption, encryptOption, decryptOption, vOption bool
+	var helpOption, encryptOption, decryptOption, vOption, rmOption bool
 	var err error
 
 	flag.StringVar(&inputFile, "i", "", "File to encrypt/decrypt")
@@ -25,6 +25,7 @@ func main() {
 	flag.BoolVar(&decryptOption, "d", false, "Decrypt option")
 	flag.BoolVar(&vOption, "v", false, "Get version")
 	flag.BoolVar(&helpOption, "h", false, "Print help")
+	flag.BoolVar(&rmOption, "rm", false, "remove input file after encryption/decryption")
 	flag.Parse()
 
 	if vOption {
@@ -75,6 +76,14 @@ func main() {
 	}
 	if decryptOption {
 		err = decryptFile(key, inputFile, outputFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+			os.Exit(1)
+		}
+	}
+
+	if rmOption {
+		err = os.Remove(inputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 			os.Exit(1)
