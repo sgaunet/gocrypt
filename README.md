@@ -1,6 +1,6 @@
 # Gocrypt
 
-gocrypt is a little command line tool to encrypt/decrypt file in AES128/256/512.
+gocrypt is a command line tool to encrypt/decrypt file in AES128/256/512.
 
 Usage is quite simple :
 

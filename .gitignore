@@ -1,4 +1,6 @@
 *.log
 tests/outputs/*.txt
+tests/outputs/*.enc
+tests/outputs/*.ori
 tests/inputs/BIG
 dist

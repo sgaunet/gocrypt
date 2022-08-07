@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 var version string = "development"
@@ -33,7 +34,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if inputFile == "" || outputFile == "" || keyFile == "" {
+	if inputFile == "" || keyFile == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -51,6 +52,18 @@ func main() {
 	if !isFileExists(inputFile) {
 		fmt.Fprintf(os.Stderr, "File %s does not exist\n", inputFile)
 		os.Exit(1)
+	}
+
+	if outputFile == "" && encryptOption {
+		outputFile = fmt.Sprintf("%s.enc", inputFile)
+		fmt.Println("outputfile not specified, initialised to :", outputFile)
+	}
+	if outputFile == "" && decryptOption {
+		outputFile = strings.Replace(inputFile, ".enc", "", 1)
+		if inputFile == outputFile {
+			outputFile = fmt.Sprintf("%s.ori", inputFile)
+		}
+		fmt.Println("outputfile not specified, initialised to :", outputFile)
 	}
 
 	if isFileExists(outputFile) {

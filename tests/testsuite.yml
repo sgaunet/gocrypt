@@ -72,3 +72,39 @@ testcases:
       diff -q inputs/input.txt outputs/decrypted.txt
     assertions:
     - result.code ShouldEqual 0
+
+- name: outputfile not mandatory
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/outputs/crypted.txt -d  -k tests/inputs/key-AES128.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/
+      diff -q inputs/input.txt outputs/crypted.txt.ori
+    assertions:
+    - result.code ShouldEqual 0
+    
+- name: outputfile not mandatory
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/outputs/decrypted.txt -e  -k tests/inputs/key-AES128.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/
+      diff -q outputs/crypted.txt outputs/decrypted.txt.enc
+    assertions:
+    - result.code ShouldEqual 0
