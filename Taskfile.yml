@@ -7,8 +7,8 @@ tasks:
   default:
     cmds:
       #- echo "{{.GREETING}}"
-      - go build .
-      - upx {{.BINFILE}}
+      - CGO_ENABLED=0 go build .
+      - upx -q {{.BINFILE}}
     # silent: true
     method: checksum
     generates:
