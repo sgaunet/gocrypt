@@ -108,3 +108,12 @@ testcases:
       diff -q outputs/crypted.txt outputs/decrypted.txt.enc
     assertions:
     - result.code ShouldEqual 0
+
+- name: encrypt a file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128-WithCR.txt
+    assertions:
+    - result.code ShouldEqual 0

@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 // (128, 192, or 256 bits // 8 bits= one character)
@@ -24,12 +25,14 @@ func getKey(keyFilename string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(key) != KEY_LENGTH_AES128 && len(key) != KEY_LENGTH_AES256 && len(key) != KEY_LENGTH_AES512 {
+	keyWithoutCR := strings.Trim(string(key), "\r\n")
+
+	if len(keyWithoutCR) != KEY_LENGTH_AES128 && len(keyWithoutCR) != KEY_LENGTH_AES256 && len(keyWithoutCR) != KEY_LENGTH_AES512 {
 		errMsg := fmt.Sprintf("length of key should be %d, %d or %d characters if you want to respectively encrypt in AES-128, AES-256 or AES-512", KEY_LENGTH_AES128, KEY_LENGTH_AES256, KEY_LENGTH_AES512)
 		return nil, errors.New(errMsg)
 	}
 
-	return key, err
+	return []byte(keyWithoutCR), err
 }
 
 func encryptFile(key []byte, inputFile string, outputFile string) error {
