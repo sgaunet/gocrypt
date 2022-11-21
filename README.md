@@ -26,7 +26,7 @@ Download the binary in the release section. There is no docker image, but you ca
 
 ```
 brew tap sgaunet/tools
-brew install mdtohtml
+brew install gocrypt
 ```
 
 # Tests
