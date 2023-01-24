@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -34,7 +35,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	if inputFile == "" || keyFile == "" {
+	if inputFile == "" {
+		fmt.Fprintf(os.Stderr, "error: option -i is mandatory\n\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+	if keyFile == "" {
+		fmt.Fprintf(os.Stderr, "error: option -k is mandatory\n\n")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -49,57 +56,83 @@ func main() {
 		os.Exit(0)
 	}
 
-	if !isFileExists(inputFile) {
-		fmt.Fprintf(os.Stderr, "File %s does not exist\n", inputFile)
-		os.Exit(1)
-	}
-
-	if outputFile == "" && encryptOption {
-		outputFile = fmt.Sprintf("%s.enc", inputFile)
-		fmt.Println("outputfile not specified, initialised to :", outputFile)
-	}
-	if outputFile == "" && decryptOption {
-		outputFile = strings.Replace(inputFile, ".enc", "", 1)
-		if inputFile == outputFile {
-			outputFile = fmt.Sprintf("%s.ori", inputFile)
-		}
-		fmt.Println("outputfile not specified, initialised to :", outputFile)
-	}
-
-	if isFileExists(outputFile) {
-		err = os.Remove(outputFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Cannot remove file %s\n", outputFile)
-			os.Exit(1)
-		}
-	}
-
+	// if !isFileExists(inputFile) {
+	// 	fmt.Fprintf(os.Stderr, "File %s does not exist\n", inputFile)
+	// 	os.Exit(1)
+	// }
 	key, err := getKey(keyFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 		os.Exit(1)
 	}
 
-	if encryptOption {
-		err = encryptFile(key, inputFile, outputFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
-			os.Exit(1)
-		}
-	}
-	if decryptOption {
-		err = decryptFile(key, inputFile, outputFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
-			os.Exit(1)
-		}
+	nbFiles := countFiles(inputFile)
+	isThereMultipleFilesToTreat := nbFiles > 1
+
+	if isThereMultipleFilesToTreat && outputFile != "" {
+		fmt.Fprintf(os.Stderr, "error: multiple files to treat is not compatible with option -o\n\n")
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
-	if rmOption {
-		err = os.Remove(inputFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
-			os.Exit(1)
+	matches, _ := filepath.Glob(inputFile)
+	for _, f := range matches {
+		if encryptOption {
+			if !isThereMultipleFilesToTreat && outputFile == "" {
+				outputFile = fmt.Sprintf("%s.enc", f)
+			}
+		} else {
+			if !isThereMultipleFilesToTreat && outputFile == "" {
+				outputFile = strings.Replace(f, ".enc", "", 1)
+				if inputFile == outputFile {
+					outputFile = fmt.Sprintf("%s.ori", f)
+				}
+			}
+
 		}
+		if isFileExists(outputFile) {
+			err = os.Remove(outputFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Cannot remove file %s\n", outputFile)
+				os.Exit(1)
+			}
+		}
+
+		if encryptOption {
+			err = encryptFile(key, f, outputFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
+		}
+		if decryptOption {
+			err = decryptFile(key, f, outputFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
+		}
+
+		if rmOption {
+			err = os.Remove(f)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
+		}
+
 	}
+
+	// if outputFile == "" && encryptOption {
+	// 	outputFile = fmt.Sprintf("%s.enc", inputFile)
+	// 	fmt.Println("outputfile not specified, initialised to :", outputFile)
+	// }
+	// if outputFile == "" && decryptOption {
+	// 	outputFile = strings.Replace(inputFile, ".enc", "", 1)
+	// 	if inputFile == outputFile {
+	// 		outputFile = fmt.Sprintf("%s.ori", inputFile)
+	// 	}
+	// 	fmt.Println("outputfile not specified, initialised to :", outputFile)
+	// }
+
 }

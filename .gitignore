@@ -4,3 +4,4 @@ tests/outputs/*.enc
 tests/outputs/*.ori
 tests/inputs/BIG
 dist
+gocrypt

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -21,7 +20,7 @@ func getKey(keyFilename string) ([]byte, error) {
 		return nil, errors.New("file " + keyFilename + " does not exist.")
 	}
 
-	key, err := ioutil.ReadFile(keyFilename)
+	key, err := os.ReadFile(keyFilename)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func encryptFile(key []byte, inputFile string, outputFile string) error {
 	defer writer.Close()
 
 	iv := make([]byte, aes.BlockSize)
-	stream := cipher.NewOFB(block, iv[:])
+	stream := cipher.NewOFB(block, iv)
 	cipherWriter := &cipher.StreamWriter{
 		S: stream,
 		W: writer,
@@ -84,7 +83,7 @@ func decryptFile(key []byte, inputFile string, outputFile string) error {
 	defer f.Close()
 
 	iv := make([]byte, aes.BlockSize)
-	stream := cipher.NewOFB(block, iv[:])
+	stream := cipher.NewOFB(block, iv)
 	cipherReader := &cipher.StreamReader{S: stream, R: reader}
 	if _, err = io.Copy(f, cipherReader); err != nil {
 		return err
