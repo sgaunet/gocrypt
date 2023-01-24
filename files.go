@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"path/filepath"
 )
 
 // func isDirExists(dir string) bool {
@@ -34,7 +33,7 @@ func isFileExists(file string) bool {
 // 	return true
 // }
 
-func countFiles(inputFile string) int {
-	matches, _ := filepath.Glob(inputFile)
-	return len(matches)
-}
+// func countFiles(inputFile string) int {
+// 	matches, _ := filepath.Glob(inputFile)
+// 	return len(matches)
+// }
