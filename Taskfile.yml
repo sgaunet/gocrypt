@@ -14,6 +14,21 @@ tasks:
     generates:
       - "{{.BINFILE}}"
 
+  hook-prereq:
+    cmds:
+      - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+      - go install -v github.com/go-critic/go-critic/cmd/gocritic@latest
+
+  pre-commit:
+    cmds:
+      - pre-commit
+
+  tests:
+    dir: tests
+    cmds:
+      - venom run testsuite.yml --output-dir="log" --stop-on-failure
+      - venom run TS-bigfile.yml --output-dir="log" --stop-on-failure
+
   snapshot:
     cmds:
       - GITLAB_TOKEN="" goreleaser --rm-dist --snapshot

@@ -34,7 +34,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	if inputFile == "" || keyFile == "" {
+	if inputFile == "" {
+		fmt.Fprintf(os.Stderr, "error: option -i is mandatory\n\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+	if keyFile == "" {
+		fmt.Fprintf(os.Stderr, "error: option -k is mandatory\n\n")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
