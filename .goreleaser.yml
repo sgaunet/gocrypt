@@ -40,17 +40,11 @@ builds:
       - "7"
     # dir: src
     id: win
+
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    format_overrides:
-    - goos: windows
-      format: zip
+    format: binary
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -140,9 +134,7 @@ snapshot:
 #       - sgaunet/{{ .ProjectName }}:latest-armv6
 #       - sgaunet/{{ .ProjectName }}:latest-armv7
 
-source:
-  # https://goreleaser.com/customization/source/
-  enabled: true
+
 changelog:
   sort: asc
   filters:
