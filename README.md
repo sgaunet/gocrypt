@@ -37,3 +37,28 @@ Tests are done with [venom](https://github.com/ovh/venom).
 cd tests
 venom run
 ```
+
+# Development
+
+This project is using :
+
+* golang
+* [task for development](https://taskfile.dev/#/)
+* docker
+* [docker buildx](https://github.com/docker/buildx)
+* docker manifest
+* [goreleaser](https://goreleaser.com/)
+* [venom](https://github.com/ovh/venom) : Tests
+* [pre-commit](https://pre-commit.com/)
+
+There are hooks executed in the precommit stage. Once the project cloned on your disk, please install pre-commit:
+
+```
+brew install pre-commit
+```
+
+And install the hooks
+
+```
+pre-commit install
+```

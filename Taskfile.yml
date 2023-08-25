@@ -3,25 +3,18 @@ version: '3'
 vars:
   BINFILE: gocrypt
 
+includes:
+  dev: ./Taskfile_dev.yml
+
 tasks:
   default:
     cmds:
-      #- echo "{{.GREETING}}"
       - CGO_ENABLED=0 go build .
       - upx -q {{.BINFILE}}
     # silent: true
     method: checksum
     generates:
       - "{{.BINFILE}}"
-
-  hook-prereq:
-    cmds:
-      - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
-      - go install -v github.com/go-critic/go-critic/cmd/gocritic@latest
-
-  pre-commit:
-    cmds:
-      - pre-commit
 
   tests:
     dir: tests
