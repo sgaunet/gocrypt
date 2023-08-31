@@ -2,7 +2,7 @@
 version: '3'
 
 tasks:
-  prereq:
+  install-prereq:
     cmds:
       - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
       - go install github.com/go-critic/go-critic/cmd/gocritic@latest
@@ -13,7 +13,7 @@ tasks:
       - go install github.com/google/osv-scanner/cmd/osv-scanner@v1
 
   # install hooks
-  install:
+  install-pre-commit:
     cmds:
       - pre-commit install
 

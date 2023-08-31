@@ -25,8 +25,7 @@ Download the binary in the release section. There is no docker image, but you ca
 ## With homebrew
 
 ```
-brew tap sgaunet/tools
-brew install gocrypt
+brew install sgaunet/tools/gocrypt
 ```
 
 # Tests
@@ -57,8 +56,21 @@ There are hooks executed in the precommit stage. Once the project cloned on your
 brew install pre-commit
 ```
 
-And install the hooks
+Install tools:
 
 ```
-pre-commit install
+task dev:install-prereq
 ```
+
+And install the hooks:
+
+```
+task dev:install-pre-commit
+```
+
+If you like to launch manually the pre-commmit hook:
+
+```
+task dev:pre-commit
+```
+
