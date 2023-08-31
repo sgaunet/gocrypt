@@ -1,4 +1,4 @@
-package main
+package aes
 
 import (
 	"crypto/aes"
@@ -15,11 +15,7 @@ const KEY_LENGTH_AES128 = 16
 const KEY_LENGTH_AES256 = 24
 const KEY_LENGTH_AES512 = 32
 
-func getKey(keyFilename string) ([]byte, error) {
-	if !isFileExists(keyFilename) {
-		return nil, errors.New("file " + keyFilename + " does not exist.")
-	}
-
+func GetKey(keyFilename string) ([]byte, error) {
 	key, err := os.ReadFile(keyFilename)
 	if err != nil {
 		return nil, err
@@ -34,7 +30,7 @@ func getKey(keyFilename string) ([]byte, error) {
 	return []byte(keyWithoutCR), err
 }
 
-func encryptFile(key []byte, inputFile string, outputFile string) error {
+func EncryptFile(key []byte, inputFile string, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -64,7 +60,7 @@ func encryptFile(key []byte, inputFile string, outputFile string) error {
 	return nil
 }
 
-func decryptFile(key []byte, inputFile string, outputFile string) error {
+func DecryptFile(key []byte, inputFile string, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {

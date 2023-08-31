@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/sgaunet/gocrypt/pkg/aes"
 )
 
 var version string = "development"
@@ -80,21 +82,21 @@ func main() {
 		}
 	}
 
-	key, err := getKey(keyFile)
+	key, err := aes.GetKey(keyFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 		os.Exit(1)
 	}
 
 	if encryptOption {
-		err = encryptFile(key, inputFile, outputFile)
+		err = aes.EncryptFile(key, inputFile, outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 			os.Exit(1)
 		}
 	}
 	if decryptOption {
-		err = decryptFile(key, inputFile, outputFile)
+		err = aes.DecryptFile(key, inputFile, outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 			os.Exit(1)
@@ -108,4 +110,14 @@ func main() {
 			os.Exit(1)
 		}
 	}
+}
+
+func isFileExists(file string) bool {
+	f, err := os.Open(file)
+	if os.IsNotExist(err) {
+		return false
+	}
+	defer f.Close()
+	i, _ := os.Stat(file)
+	return !i.IsDir()
 }

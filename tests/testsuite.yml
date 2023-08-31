@@ -9,7 +9,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . 
+      go run cmd/gocrypt/*.go
     assertions:
     - result.code ShouldEqual 1
 
@@ -18,7 +18,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/inputs/input.txt -e -d -o tests/outputs/wrong.txt -k tests/inputs/wrongkey.txt
+      go run cmd/gocrypt/*.go -i tests/inputs/input.txt -e -d -o tests/outputs/wrong.txt -k tests/inputs/wrongkey.txt
     assertions:
     - result.code ShouldEqual 1
 
@@ -27,7 +27,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128.txt
+      go run cmd/gocrypt/*.go -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -36,7 +36,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted-AES256.txt  -k tests/inputs/key-AES256.txt
+      go run cmd/gocrypt/*.go -i tests/inputs/input.txt -e -o tests/outputs/crypted-AES256.txt  -k tests/inputs/key-AES256.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -61,7 +61,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/outputs/crypted.txt -d -o tests/outputs/decrypted.txt  -k tests/inputs/key-AES128.txt
+      go run cmd/gocrypt/*.go -i tests/outputs/crypted.txt -d -o tests/outputs/decrypted.txt  -k tests/inputs/key-AES128.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -78,7 +78,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/outputs/crypted.txt -d  -k tests/inputs/key-AES128.txt
+      go run cmd/gocrypt/*.go -i tests/outputs/crypted.txt -d  -k tests/inputs/key-AES128.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -96,7 +96,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/outputs/decrypted.txt -e  -k tests/inputs/key-AES128.txt
+      go run cmd/gocrypt/*.go -i tests/outputs/decrypted.txt -e  -k tests/inputs/key-AES128.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -114,6 +114,6 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128-WithCR.txt
+      go run cmd/gocrypt/*.go -i tests/inputs/input.txt -e -o tests/outputs/crypted.txt  -k tests/inputs/key-AES128-WithCR.txt
     assertions:
     - result.code ShouldEqual 0

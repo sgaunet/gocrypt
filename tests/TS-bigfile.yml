@@ -14,7 +14,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/inputs/BIG -e -o tests/outputs/crypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
+      go run cmd/gocrypt/*.go -i tests/inputs/BIG -e -o tests/outputs/crypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -31,7 +31,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . -i tests/outputs/crypted-BIG-AES512.txt -d -o tests/outputs/decrypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
+      go run cmd/gocrypt/*.go -i tests/outputs/crypted-BIG-AES512.txt -d -o tests/outputs/decrypted-BIG-AES512.txt  -k tests/inputs/key-AES512.txt
     assertions:
     - result.code ShouldEqual 0
 
