@@ -3,7 +3,7 @@
 before:
   hooks:
     # You may remove this if you don't use go modules.
-    - go mod download
+    - go get
     # you may remove this if you don't need go generate
     #- go generate ./...
 builds:
@@ -22,7 +22,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    dir: cmd/gocrypt
+    # dir: cmd/gocrypt
     id: gocrypt
     binary: gocrypt
 
@@ -141,6 +141,6 @@ brews:
     commit_author:
       name: sgaunet
       email: sgaunet@gmail.com
-    tap:
+    repository:
       owner: sgaunet
       name: homebrew-tools
