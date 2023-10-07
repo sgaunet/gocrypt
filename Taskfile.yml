@@ -9,11 +9,8 @@ includes:
 tasks:
   default:
     cmds:
-      - CGO_ENABLED=0 go build -o gocrypt cmd/gocrypt/*.go
+      - CGO_ENABLED=0 go build -o gocrypt cmd/*.go
     # silent: true
-    method: checksum
-    generates:
-      - "{{.BINFILE}}"
 
   tests:
     dir: tests
