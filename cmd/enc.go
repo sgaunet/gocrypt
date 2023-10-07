@@ -14,6 +14,7 @@ var encCmd = &cobra.Command{
 	Short: "encrypt file in AES 128/256/512",
 	Long:  `encrypt file in AES 128/256/512`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var overwriteOriginalFile bool
 		var err error
 
 		if inputFile == "" {
@@ -28,11 +29,17 @@ var encCmd = &cobra.Command{
 		}
 
 		if outputFile == "" {
-			outputFile = fmt.Sprintf("%s.enc", inputFile)
-			fmt.Println("outputfile not specified, initialised to :", outputFile)
+			overwriteOriginalFile = true
+			tmpFile, err := os.CreateTemp("/tmp", "gocrypt")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Cannot create temp file\n")
+				os.Exit(1)
+			}
+			outputFile = tmpFile.Name()
+			tmpFile.Close()
 		}
 
-		if isFileExists(outputFile) {
+		if isFileExists(outputFile) && !overwriteOriginalFile {
 			err = os.Remove(outputFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Cannot remove file %s\n", outputFile)
@@ -50,6 +57,15 @@ var encCmd = &cobra.Command{
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
 			os.Exit(1)
+		}
+
+		if overwriteOriginalFile {
+			// rename tmp file to original file
+			err = os.Rename(outputFile, inputFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
 		}
 
 		if rmOption {

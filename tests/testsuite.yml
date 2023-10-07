@@ -4,7 +4,16 @@ testcases:
 - name: init
   steps:
 
-- name: encrypt a file
+- name: purge output dir
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      rm -f tests/outputs/*
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: encrypt inputs/input.txt with AES128 to outputs/crypted.txt
   steps:
   - type: exec
     script: |
@@ -13,7 +22,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
 
-- name: encrypt a file AES256
+- name: encrypt inputs/input.txt with AES26 to outputs/crypted-AES26.txt
   steps:
   - type: exec
     script: |
@@ -38,7 +47,7 @@ testcases:
     assertions:
     - result.code ShouldNotEqual 0
 
-- name: decrypt file
+- name: decrypt outputs/crypted.txt to outputs/decrypted.txt
   steps:
   - type: exec
     script: |
@@ -55,7 +64,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
 
-- name: outputfile not mandatory
+- name: outputfile not mandatory (decrypt outputs/crypted.txt)
   steps:
   - type: exec
     script: |
@@ -69,16 +78,25 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/
-      diff -q inputs/input.txt outputs/crypted.txt.ori
+      diff -q inputs/input.txt outputs/crypted.txt
     assertions:
     - result.code ShouldEqual 0
-    
-- name: outputfile not mandatory
+
+- name: outputfile not mandatory encrypt again (outputs/crypted.txt)
   steps:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . enc --i tests/outputs/decrypted.txt --k tests/inputs/key-AES128.txt
+      go run . enc --i tests/outputs/crypted.txt --k tests/inputs/key-AES128.txt
+    assertions:
+    - result.code ShouldEqual 0
+    
+- name: outputfile not mandatory decrypt again (outputs/crypted.txt)
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      go run . enc --i tests/inputs/input.txt --k tests/inputs/key-AES128.txt --o tests/outputs/crypted.txt.enc
     assertions:
     - result.code ShouldEqual 0
 
@@ -86,16 +104,7 @@ testcases:
   steps:
   - type: exec
     script: |
-      cd {{.venom.testsuite.workdir}}/
-      diff -q outputs/crypted.txt outputs/decrypted.txt.enc
-    assertions:
-    - result.code ShouldEqual 0
-
-- name: encrypt a file
-  steps:
-  - type: exec
-    script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . enc --i tests/inputs/input.txt --o tests/outputs/crypted.txt  --k tests/inputs/key-AES128-WithCR.txt
+      diff -q tests/outputs/crypted.txt tests/outputs/crypted.txt.enc
     assertions:
     - result.code ShouldEqual 0

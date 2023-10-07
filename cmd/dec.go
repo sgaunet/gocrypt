@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/sgaunet/gocrypt/internal/aes"
 	"github.com/spf13/cobra"
@@ -15,6 +14,7 @@ var decCmd = &cobra.Command{
 	Short: "decrypt file in AES 128/256/512",
 	Long:  `decrypt file in AES 128/256/512`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var overwriteOriginalFile bool
 		var err error
 
 		if inputFile == "" {
@@ -29,14 +29,17 @@ var decCmd = &cobra.Command{
 		}
 
 		if outputFile == "" {
-			outputFile = strings.Replace(inputFile, ".enc", "", 1)
-			if inputFile == outputFile {
-				outputFile = fmt.Sprintf("%s.ori", inputFile)
+			overwriteOriginalFile = true
+			tmpFile, err := os.CreateTemp("/tmp", "gocrypt")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Cannot create temp file\n")
+				os.Exit(1)
 			}
-			fmt.Println("outputfile not specified, initialised to :", outputFile)
+			outputFile = tmpFile.Name()
+			tmpFile.Close()
 		}
 
-		if isFileExists(outputFile) {
+		if isFileExists(outputFile) && !overwriteOriginalFile {
 			err = os.Remove(outputFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Cannot remove file %s\n", outputFile)
@@ -56,7 +59,16 @@ var decCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if rmOption {
+		if overwriteOriginalFile {
+			// rename tmp file to original file
+			err = os.Rename(outputFile, inputFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
+		}
+
+		if rmOption && !overwriteOriginalFile {
 			err = os.Remove(inputFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
