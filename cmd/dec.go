@@ -16,6 +16,13 @@ var decCmd = &cobra.Command{
 	Long:  `decrypt file in AES 128/256/512`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
+
+		if inputFile == "" {
+			fmt.Fprintf(os.Stderr, "inputfile not specified\n")
+			cmd.Help()
+			os.Exit(1)
+		}
+
 		if !isFileExists(inputFile) {
 			fmt.Fprintf(os.Stderr, "File %s does not exist\n", inputFile)
 			os.Exit(1)
