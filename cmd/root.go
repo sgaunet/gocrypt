@@ -30,13 +30,13 @@ func Execute() {
 func init() {
 	encCmd.Flags().StringVar(&inputFile, "i", "", "file to encrypt")
 	encCmd.Flags().StringVar(&outputFile, "o", "", "output file")
-	encCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to encrypt")
+	encCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to encrypt (or set GOCRYPT_KEY env variable)")
 	encCmd.Flags().BoolVar(&rmOption, "del", false, "delete source file after encryption")
 	rootCmd.AddCommand(encCmd)
 
 	decCmd.Flags().StringVar(&inputFile, "i", "", "file to decrypt")
 	decCmd.Flags().StringVar(&outputFile, "o", "", "output file")
-	decCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to decrypt")
+	decCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to decrypt (or set GOCRYPT_KEY env variable)")
 	decCmd.Flags().BoolVar(&rmOption, "del", false, "delete source file after decryption")
 	rootCmd.AddCommand(decCmd)
 }

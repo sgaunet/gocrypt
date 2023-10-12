@@ -1,0 +1,116 @@
+name: Exec testsuite
+
+testcases:
+- name: init
+  steps:
+
+- name: purge output dir
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      rm -f tests/outputs/*
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: encrypt inputs/input.txt with AES128 to outputs/crypted.txt
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES128.txt)
+      go run . enc --i tests/inputs/input.txt --o tests/outputs/crypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: encrypt inputs/input.txt with AES26 to outputs/crypted-AES26.txt
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES256.txt)
+      go run . enc --i tests/inputs/input.txt --o tests/outputs/crypted-AES256.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between crypted files in AES256 and AES128
+  steps:
+  - type: exec
+    script: |
+      diff -q tests/outputs/crypted.txt tests/outputs/crypted-AES256.txt
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: diff between input and crypted file
+  steps:
+  - type: exec
+    script: |
+      diff -q tests/inputs/input.txt tests/outputs/crypted.txt
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: decrypt outputs/crypted.txt to outputs/decrypted.txt
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES128.txt)
+      go run . dec --i tests/outputs/crypted.txt --o tests/outputs/decrypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      diff -q inputs/input.txt outputs/decrypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: outputfile not mandatory (decrypt outputs/crypted.txt)
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES128.txt)
+      go run . dec --i tests/outputs/crypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/
+      diff -q inputs/input.txt outputs/crypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: outputfile not mandatory encrypt again (outputs/crypted.txt)
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES128.txt)
+      go run . enc --i tests/outputs/crypted.txt
+    assertions:
+    - result.code ShouldEqual 0
+    
+- name: outputfile not mandatory decrypt again (outputs/crypted.txt)
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      export GOCRYPT_KEY=$(cat tests/inputs/key-AES128.txt)
+      go run . enc --i tests/inputs/input.txt --o tests/outputs/crypted.txt.enc
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: diff between input and decrypted file
+  steps:
+  - type: exec
+    script: |
+      cd {{.venom.testsuite.workdir}}/..
+      diff -q tests/outputs/crypted.txt tests/outputs/crypted.txt.enc
+    assertions:
+    - result.code ShouldEqual 0

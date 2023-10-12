@@ -5,17 +5,23 @@ gocrypt is a command line tool to encrypt/decrypt file in AES128/256/512.
 Usage is quite simple :
 
 ```
-$ gocrypt -h
-  -d    decrypt option
-  -e    encrypt option
-  -h    Print help
-  -i string
-        File to encrypt/decrypt
-  -k string
-        Name of file containing the key
-  -o string
-        Output file
-  -v    Get version
+$ gocrypt help
+Tool to encrypt/decrypt file in AES128/256/512.
+
+Usage:
+  gocrypt [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  dec         decrypt file in AES 128/256/512
+  enc         encrypt file in AES 128/256/512
+  help        Help about any command
+  version     print version of gocrypt
+
+Flags:
+  -h, --help   help for gocrypt
+
+Use "gocrypt [command] --help" for more information about a command.
 ```
 
 # Install

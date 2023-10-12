@@ -15,7 +15,22 @@ const KEY_LENGTH_AES128 = 16
 const KEY_LENGTH_AES256 = 24
 const KEY_LENGTH_AES512 = 32
 
-func GetKey(keyFilename string) ([]byte, error) {
+func GetKey(keyFilename string) (key []byte, err error) {
+	keyFromEnv := os.Getenv("GOCRYPT_KEY")
+	keyFromFile, err := getKeyFromFile(keyFilename)
+	if err != nil {
+		key = []byte(keyFromEnv)
+	}
+	if err == nil {
+		key = keyFromFile
+	}
+	if len(key) == 0 {
+		return nil, errors.New("key is empty or not set")
+	}
+	return key, nil
+}
+
+func getKeyFromFile(keyFilename string) ([]byte, error) {
 	key, err := os.ReadFile(keyFilename)
 	if err != nil {
 		return nil, err
