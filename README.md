@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/gocrypt)](https://goreportcard.com/report/github.com/sgaunet/gocrypt)
+
 # Gocrypt
 
 gocrypt is a command line tool to encrypt/decrypt file in AES128/256/512.
