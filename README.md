@@ -24,6 +24,10 @@ Flags:
 Use "gocrypt [command] --help" for more information about a command.
 ```
 
+Here is a little demo:
+
+![Demo](doc/demo.gif)
+
 # Install
 
 Download the binary in the release section. There is no docker image, but you can install a binary in your Docker image if needed. If you want to create a docker image from scratch, you will need to do a multi stage docker build in order to download the binary.
