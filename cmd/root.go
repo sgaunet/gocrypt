@@ -14,10 +14,10 @@ var rmOption bool
 var rootCmd = &cobra.Command{
 	Use:   "gocrypt",
 	Short: "Tool to encrypt/decrypt file in AES128/256/512.",
-	Long:  `Tool to encrypt/decrypt file in AES128/256/512.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Long: `Tool to encrypt/decrypt file in AES128/256/512. 
+	
+The key can be provided in a file or in the GOCRYPT_KEY environment variable.
+The length of the key string must be 12 (AES128), 24 (AES256) or 32 (AES512).`,
 }
 
 func Execute() {
@@ -39,4 +39,5 @@ func init() {
 	decCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to decrypt (or set GOCRYPT_KEY env variable)")
 	decCmd.Flags().BoolVar(&rmOption, "del", false, "delete source file after decryption")
 	rootCmd.AddCommand(decCmd)
+	// rootCmd.AddCommand(genCmd)
 }
