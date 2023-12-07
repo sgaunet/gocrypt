@@ -39,5 +39,5 @@ func init() {
 	decCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to decrypt (or set GOCRYPT_KEY env variable)")
 	decCmd.Flags().BoolVar(&rmOption, "del", false, "delete source file after decryption")
 	rootCmd.AddCommand(decCmd)
-	// rootCmd.AddCommand(genCmd)
+	rootCmd.AddCommand(genCmd)
 }
