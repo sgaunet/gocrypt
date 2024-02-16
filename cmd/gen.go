@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"os"
 
 	"github.com/sgaunet/gocrypt/internal/aes"
 	"github.com/spf13/cobra"
@@ -20,7 +21,12 @@ var genAES128Cmd = &cobra.Command{
 	Short: "generate AES 128 key",
 	Long:  `generate AES 128 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(aes.KeyLenAES128))
+		res, err := genRandomString(aes.KeyLenAES128)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		fmt.Println(res)
 	},
 }
 
@@ -29,7 +35,12 @@ var genAES256Cmd = &cobra.Command{
 	Short: "generate AES 256 key",
 	Long:  `generate AES 256 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(aes.KeyLenAES256))
+		res, err := genRandomString(aes.KeyLenAES256)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		fmt.Println(res)
 	},
 }
 
@@ -38,7 +49,12 @@ var genAES512Cmd = &cobra.Command{
 	Short: "generate AES 512 key",
 	Long:  `generate AES 512 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(aes.KeyLenAES512))
+		res, err := genRandomString(aes.KeyLenAES512)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		fmt.Println(res)
 	},
 }
 
