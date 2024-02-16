@@ -11,9 +11,9 @@ import (
 )
 
 // (128, 192, or 256 bits // 8 bits= one character)
-const KEY_LENGTH_AES128 = 16
-const KEY_LENGTH_AES256 = 24
-const KEY_LENGTH_AES512 = 32
+const KeyLenAES128 = 16
+const KeyLenAES256 = 24
+const KeyLenAES512 = 32
 
 func GetKey(keyFilename string) (key []byte, err error) {
 	keyFromEnv := os.Getenv("GOCRYPT_KEY")
@@ -37,15 +37,15 @@ func getKeyFromFile(keyFilename string) ([]byte, error) {
 	}
 	keyWithoutCR := strings.Trim(string(key), "\r\n")
 
-	if len(keyWithoutCR) != KEY_LENGTH_AES128 && len(keyWithoutCR) != KEY_LENGTH_AES256 && len(keyWithoutCR) != KEY_LENGTH_AES512 {
-		errMsg := fmt.Sprintf("length of key should be %d, %d or %d characters if you want to respectively encrypt in AES-128, AES-256 or AES-512", KEY_LENGTH_AES128, KEY_LENGTH_AES256, KEY_LENGTH_AES512)
+	if len(keyWithoutCR) != KeyLenAES128 && len(keyWithoutCR) != KeyLenAES256 && len(keyWithoutCR) != KeyLenAES512 {
+		errMsg := fmt.Sprintf("length of key should be %d (AES128), %d (AES256) or %d (AES512)", KeyLenAES128, KeyLenAES256, KeyLenAES512)
 		return nil, errors.New(errMsg)
 	}
 
 	return []byte(keyWithoutCR), err
 }
 
-func EncryptFile(key []byte, inputFile string, outputFile string) error {
+func EncryptFile(key []byte, inputFile, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -75,7 +75,7 @@ func EncryptFile(key []byte, inputFile string, outputFile string) error {
 	return nil
 }
 
-func DecryptFile(key []byte, inputFile string, outputFile string) error {
+func DecryptFile(key []byte, inputFile, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
 	if err != nil {

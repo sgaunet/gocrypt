@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/sgaunet/gocrypt/internal/aes"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ var genAES128Cmd = &cobra.Command{
 	Short: "generate AES 128 key",
 	Long:  `generate AES 128 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(16))
+		fmt.Println(genRandomString(aes.KeyLenAES128))
 	},
 }
 
@@ -27,7 +28,7 @@ var genAES256Cmd = &cobra.Command{
 	Short: "generate AES 256 key",
 	Long:  `generate AES 256 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(24))
+		fmt.Println(genRandomString(aes.KeyLenAES256))
 	},
 }
 
@@ -36,7 +37,7 @@ var genAES512Cmd = &cobra.Command{
 	Short: "generate AES 512 key",
 	Long:  `generate AES 512 key`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(genRandomString(32))
+		fmt.Println(genRandomString(aes.KeyLenAES512))
 	},
 }
 
