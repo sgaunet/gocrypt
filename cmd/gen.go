@@ -1,8 +1,9 @@
 package cmd
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 
 	"github.com/sgaunet/gocrypt/internal/aes"
 	"github.com/spf13/cobra"
@@ -48,11 +49,16 @@ func init() {
 }
 
 // genRandomString generates a random string of length n
-func genRandomString(n int) string {
+func genRandomString(n int) (string, error) {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	max := big.NewInt(int64(len(letters)))
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		idx, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", err
+		}
+		b[i] = letters[int(idx.Int64())]
 	}
-	return string(b)
+	return string(b), nil
 }
