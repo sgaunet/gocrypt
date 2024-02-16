@@ -20,6 +20,7 @@ The key can be provided in a file or in the GOCRYPT_KEY environment variable.
 The length of the key string must be 12 (AES128), 24 (AES256) or 32 (AES512).`,
 }
 
+// Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {

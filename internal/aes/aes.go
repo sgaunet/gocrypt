@@ -11,10 +11,17 @@ import (
 )
 
 // (128, 192, or 256 bits // 8 bits= one character)
+
+// KeyLenAES128 is the length of the key for AES128
 const KeyLenAES128 = 16
+
+// KeyLenAES256 is the length of the key for AES256
 const KeyLenAES256 = 24
+
+// KeyLenAES512 is the length of the key for AES512
 const KeyLenAES512 = 32
 
+// GetKey returns the key from the file or from the environment variable
 func GetKey(keyFilename string) (key []byte, err error) {
 	keyFromEnv := os.Getenv("GOCRYPT_KEY")
 	keyFromFile, err := getKeyFromFile(keyFilename)
@@ -45,6 +52,7 @@ func getKeyFromFile(keyFilename string) ([]byte, error) {
 	return []byte(keyWithoutCR), err
 }
 
+// EncryptFile encrypts a file
 func EncryptFile(key []byte, inputFile, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
@@ -75,6 +83,7 @@ func EncryptFile(key []byte, inputFile, outputFile string) error {
 	return nil
 }
 
+// DecryptFile decrypts a file
 func DecryptFile(key []byte, inputFile, outputFile string) error {
 	// Creating block of algorithm
 	block, err := aes.NewCipher(key)
