@@ -28,6 +28,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	encCmd.Flags().StringVar(&inputFile, "i", "", "file to encrypt")
 	encCmd.Flags().StringVar(&outputFile, "o", "", "output file")
 	encCmd.Flags().StringVar(&keyFile, "k", "", "file containing the key to encrypt (or set GOCRYPT_KEY env variable)")
