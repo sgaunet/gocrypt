@@ -134,10 +134,10 @@ brews:
     #
     # Template: allowed
     # Default: 'bin.install "BinaryName"'
-    install: |
-      bin.install "gocrypt"
-      # bash_completion.install "completions/foo.bash" => "foo"
-      # ...
+    # install: |
+    #   bin.install "gocrypt"
+    #   # bash_completion.install "completions/foo.bash" => "foo"
+    #   # ...
     commit_author:
       name: sgaunet
       email: sgaunet@gmail.com
