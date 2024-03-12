@@ -65,7 +65,7 @@ linters-settings:
     rules:
       - name: unexported-return
         disabled: true
-      - name: unused-parameter
+      # - name: unused-parameter
 
 linters:
   disable-all: true
