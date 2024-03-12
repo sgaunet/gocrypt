@@ -40,6 +40,16 @@ Download the binary in the release section. There is no docker image, but you ca
 brew install sgaunet/tools/gocrypt
 ```
 
+## Use it in your own Docker image
+
+```
+FROM sgaunet/gocrypt:latest as gocrypt
+
+FROM alpine:latest
+COPY --from=gocrypt /gocrypt /usr/local/bin/gocrypt
+...
+```
+
 # Tests
 
 Tests are done with [venom](https://github.com/ovh/venom).
