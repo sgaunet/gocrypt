@@ -35,6 +35,8 @@ Here is a little demo:
 
 ![Demo](doc/demo.gif)
 
+Even if I still maintain this little tool, you should rather consider to use [age](https://github.com/FiloSottile/age) which is a more complete and secure tool.
+
 # Install
 
 Download the binary in the release section. There is no docker image, but you can install a binary in your Docker image if needed. If you want to create a docker image from scratch, you will need to do a multi stage docker build in order to download the binary.
