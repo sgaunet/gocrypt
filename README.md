@@ -42,6 +42,7 @@ Download the binary in the release section. There is no docker image, but you ca
 ## With homebrew
 
 ```
+brew tap sgaunet/homebrew-tools
 brew install sgaunet/tools/gocrypt
 ```
 
