@@ -1,7 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/gocrypt)](https://goreportcard.com/report/github.com/sgaunet/gocrypt)
 [![GitHub release](https://img.shields.io/github/release/sgaunet/gocrypt.svg)](https://github.com/sgaunet/gocrypt/releases/latest)
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/gocrypt/total)
-[![Maintainability](https://api.codeclimate.com/v1/badges/7a634c0c2e4e4126e1b7/maintainability)](https://codeclimate.com/github/sgaunet/gocrypt/maintainability)
 [![GoDoc](https://godoc.org/github.com/sgaunet/gocrypt?status.svg)](https://godoc.org/github.com/sgaunet/gocrypt)
 [![License](https://img.shields.io/github/license/sgaunet/gocrypt.svg)](LICENSE)
 
