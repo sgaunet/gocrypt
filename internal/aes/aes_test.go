@@ -61,3 +61,41 @@ func TestEncryptDecryptFile(t *testing.T) {
 		t.Fatalf("decrypted data does not match original plaintext\nGot: %s\nWant: %s", decrypted, plaintext)
 	}
 }
+
+func TestGetKeyFromFileErrors(t *testing.T) {
+	// Non-existent file
+	_, err := GetKeyFromFile("/tmp/nonexistent_gocrypt_key.txt")
+	if err == nil {
+		t.Error("expected error for non-existent file, got nil")
+	}
+
+	// Invalid key length (too short)
+	tmpFile, err := os.CreateTemp("", "gocrypt_key_short_*.txt")
+	if err != nil {
+		t.Fatalf("failed to create temp key file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	if _, err := tmpFile.Write([]byte("shortkey")); err != nil {
+		t.Fatalf("failed to write short key: %v", err)
+	}
+	tmpFile.Close()
+	_, err = GetKeyFromFile(tmpFile.Name())
+	if err == nil {
+		t.Error("expected error for invalid key length, got nil")
+	}
+
+	// Invalid key length (not 16 or 32)
+	tmpFile2, err := os.CreateTemp("", "gocrypt_key_invalidlen_*.txt")
+	if err != nil {
+		t.Fatalf("failed to create temp key file: %v", err)
+	}
+	defer os.Remove(tmpFile2.Name())
+	if _, err := tmpFile2.Write([]byte("123456789012345678901234567")); err != nil {
+		t.Fatalf("failed to write invalid length key: %v", err)
+	}
+	tmpFile2.Close()
+	_, err = GetKeyFromFile(tmpFile2.Name())
+	if err == nil {
+		t.Error("expected error for invalid key length, got nil")
+	}
+}
