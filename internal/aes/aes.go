@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -38,6 +39,7 @@ func GetKeyFromFile(keyFilename string) ([]byte, error) {
 }
 
 // EncryptFile encrypts data from the provided io.Reader and writes the encrypted output to the provided io.Writer.
+// Each chunk is encrypted and authenticated independently with its own random nonce and tag.
 func EncryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -48,27 +50,47 @@ func EncryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 		return err
 	}
 
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := rand.Read(nonce); err != nil {
-		return err
-	}
-	// Write the nonce at the beginning of the output
-	if _, err := writer.Write(nonce); err != nil {
-		return err
-	}
-
-	plaintext, err := io.ReadAll(reader)
-	if err != nil {
-		return err
-	}
-	ciphertext := gcm.Seal(nil, nonce, plaintext, nil)
-	if _, err := writer.Write(ciphertext); err != nil {
-		return err
+	const chunkSize = 32 * 1024 // 32KB
+	buf := make([]byte, chunkSize)
+	for {
+		n, readErr := io.ReadFull(reader, buf)
+		if n > 0 {
+			plaintext := buf[:n]
+			nonce := make([]byte, gcm.NonceSize())
+			if _, err := rand.Read(nonce); err != nil {
+				return err
+			}
+			ciphertext := gcm.Seal(nil, nonce, plaintext, nil)
+			// Write chunk length (uint32, big endian)
+			var chunkLen [4]byte
+			binary.BigEndian.PutUint32(chunkLen[:], uint32(n))
+			if _, err := writer.Write(chunkLen[:]); err != nil {
+				return err
+			}
+			// Write nonce
+			if _, err := writer.Write(nonce); err != nil {
+				return err
+			}
+			// Write ciphertext (includes tag)
+			if _, err := writer.Write(ciphertext); err != nil {
+				return err
+			}
+		}
+		if readErr == io.EOF {
+			break
+		}
+		if readErr == io.ErrUnexpectedEOF {
+			break
+		}
+		if readErr != nil {
+			return readErr
+		}
 	}
 	return nil
 }
 
 // DecryptFile decrypts data from the provided io.Reader and writes the decrypted output to the provided io.Writer.
+// Each chunk is decrypted and authenticated independently.
 func DecryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -79,20 +101,35 @@ func DecryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 		return err
 	}
 
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := io.ReadFull(reader, nonce); err != nil {
-		return err
-	}
-	ciphertext, err := io.ReadAll(reader)
-	if err != nil {
-		return err
-	}
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return err
-	}
-	if _, err := writer.Write(plaintext); err != nil {
-		return err
+	const nonceSize = 12 // GCM standard
+	const tagSize = 16   // GCM standard
+	for {
+		var chunkLenBuf [4]byte
+		_, err := io.ReadFull(reader, chunkLenBuf[:])
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		chunkLen := binary.BigEndian.Uint32(chunkLenBuf[:])
+		// Read nonce
+		nonce := make([]byte, nonceSize)
+		if _, err := io.ReadFull(reader, nonce); err != nil {
+			return err
+		}
+		// Read ciphertext (chunkLen + tagSize)
+		ciphertext := make([]byte, chunkLen+uint32(tagSize))
+		if _, err := io.ReadFull(reader, ciphertext); err != nil {
+			return err
+		}
+		plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+		if err != nil {
+			return err
+		}
+		if _, err := writer.Write(plaintext); err != nil {
+			return err
+		}
 	}
 	return nil
 }
