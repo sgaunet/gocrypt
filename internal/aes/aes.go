@@ -37,8 +37,8 @@ func GetKeyFromFile(keyFilename string) ([]byte, error) {
 	return []byte(keyWithoutCR), err
 }
 
-// EncryptFile encrypts a file
-func EncryptFile(key []byte, inputFile, outputFile string) error {
+// EncryptFile encrypts data from the provided io.Reader and writes the encrypted output to the provided io.Writer.
+func EncryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err
@@ -48,24 +48,11 @@ func EncryptFile(key []byte, inputFile, outputFile string) error {
 		return err
 	}
 
-	reader, err := os.Open(inputFile)
-	if err != nil {
-		return err
-	}
-	defer reader.Close()
-
-	writer, err := os.Create(outputFile)
-	if err != nil {
-		return err
-	}
-	defer writer.Close()
-
 	nonce := make([]byte, gcm.NonceSize())
-	// Generate a secure random nonce
 	if _, err := rand.Read(nonce); err != nil {
 		return err
 	}
-	// Write the nonce at the beginning of the file
+	// Write the nonce at the beginning of the output
 	if _, err := writer.Write(nonce); err != nil {
 		return err
 	}
@@ -81,8 +68,8 @@ func EncryptFile(key []byte, inputFile, outputFile string) error {
 	return nil
 }
 
-// DecryptFile decrypts a file
-func DecryptFile(key []byte, inputFile, outputFile string) error {
+// DecryptFile decrypts data from the provided io.Reader and writes the decrypted output to the provided io.Writer.
+func DecryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return errors.New("cipher err: " + err.Error())
@@ -91,18 +78,6 @@ func DecryptFile(key []byte, inputFile, outputFile string) error {
 	if err != nil {
 		return err
 	}
-
-	reader, err := os.Open(inputFile)
-	if err != nil {
-		return err
-	}
-	defer reader.Close()
-
-	writer, err := os.Create(outputFile)
-	if err != nil {
-		return err
-	}
-	defer writer.Close()
 
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err := io.ReadFull(reader, nonce); err != nil {

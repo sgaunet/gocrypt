@@ -24,33 +24,39 @@ func TestEncryptDecryptFile(t *testing.T) {
 	if _, err := inputFile.Write(plaintext); err != nil {
 		t.Fatalf("failed to write to input file: %v", err)
 	}
-	inputFile.Close()
+	inputFile.Seek(0, 0)
 
 	outputFile, err := os.CreateTemp("", "gocrypt_output_*.bin")
 	if err != nil {
 		t.Fatalf("failed to create temp output file: %v", err)
 	}
-	outputFile.Close()
 	defer os.Remove(outputFile.Name())
 
 	// Encrypt
-	err = EncryptFile(key, inputFile.Name(), outputFile.Name())
+	err = EncryptFile(key, inputFile, outputFile)
 	if err != nil {
 		t.Fatalf("EncryptFile failed: %v", err)
 	}
+	inputFile.Close()
+	outputFile.Close()
 
 	// Decrypt
+	encFile, err := os.Open(outputFile.Name())
+	if err != nil {
+		t.Fatalf("failed to open encrypted file: %v", err)
+	}
+	defer encFile.Close()
 	decryptedFile, err := os.CreateTemp("", "gocrypt_decrypted_*.txt")
 	if err != nil {
 		t.Fatalf("failed to create temp decrypted file: %v", err)
 	}
-	decryptedFile.Close()
 	defer os.Remove(decryptedFile.Name())
 
-	err = DecryptFile(key, outputFile.Name(), decryptedFile.Name())
+	err = DecryptFile(key, encFile, decryptedFile)
 	if err != nil {
 		t.Fatalf("DecryptFile failed: %v", err)
 	}
+	decryptedFile.Close()
 
 	decrypted, err := os.ReadFile(decryptedFile.Name())
 	if err != nil {

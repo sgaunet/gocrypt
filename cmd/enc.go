@@ -61,9 +61,23 @@ var encCmd = &cobra.Command{
 			}
 		}
 
-		err = aes.EncryptFile(key, inputFile, outputFile)
+		// Open input and output files for streaming
+		inF, err := os.Open(inputFile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+			fmt.Fprintf(os.Stderr, "Cannot open input file: %v\n", err)
+			os.Exit(1)
+		}
+		defer inF.Close()
+		outF, err := os.Create(outputFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot create output file: %v\n", err)
+			os.Exit(1)
+		}
+		defer outF.Close()
+
+		err = aes.EncryptFile(key, inF, outF)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "EncryptFile failed: %v\n", err)
 			os.Exit(1)
 		}
 
