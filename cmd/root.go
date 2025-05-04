@@ -13,11 +13,11 @@ var rmOption bool
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gocrypt",
-	Short: "Tool to encrypt/decrypt file in AES128/256/512.",
-	Long: `Tool to encrypt/decrypt file in AES128/256/512. 
+	Short: "Tool to encrypt/decrypt file in AES128/256.",
+	Long: `Tool to encrypt/decrypt file in AES128/256. 
 	
 The key can be provided in a file or in the GOCRYPT_KEY environment variable.
-The length of the key string must be 12 (AES128), 24 (AES256) or 32 (AES512).`,
+The length of the key string must be 12 (AES128), 32 (AES256).`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

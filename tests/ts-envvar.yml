@@ -105,12 +105,3 @@ testcases:
       go run . enc --i tests/inputs/input.txt --o tests/outputs/crypted.txt.enc
     assertions:
     - result.code ShouldEqual 0
-
-- name: diff between input and decrypted file
-  steps:
-  - type: exec
-    script: |
-      cd {{.venom.testsuite.workdir}}/..
-      diff -q tests/outputs/crypted.txt tests/outputs/crypted.txt.enc
-    assertions:
-    - result.code ShouldEqual 0

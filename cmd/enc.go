@@ -11,12 +11,13 @@ import (
 // setCmd represents the set command
 var encCmd = &cobra.Command{
 	Use:   "enc",
-	Short: "encrypt file in AES 128/256/512",
-	Long:  `encrypt file in AES 128/256/512`,
+	Short: "encrypt file in AES 128/256",
+	Long:  `encrypt file in AES 128/256`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			tmpFile               *os.File
 			overwriteOriginalFile bool
+			key                   []byte
 			err                   error
 		)
 
@@ -50,10 +51,14 @@ var encCmd = &cobra.Command{
 			}
 		}
 
-		key, err := aes.GetKey(keyFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
-			os.Exit(1)
+		keyFromEnv := os.Getenv("GOCRYPT_KEY")
+		key = []byte(keyFromEnv)
+		if len(key) == 0 {
+			key, err = aes.GetKeyFromFile(keyFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+				os.Exit(1)
+			}
 		}
 
 		err = aes.EncryptFile(key, inputFile, outputFile)

@@ -44,24 +44,9 @@ var genAES256Cmd = &cobra.Command{
 	},
 }
 
-var genAES512Cmd = &cobra.Command{
-	Use:   "aes512",
-	Short: "generate AES 512 key",
-	Long:  `generate AES 512 key`,
-	Run: func(cmd *cobra.Command, args []string) {
-		res, err := genRandomString(aes.KeyLenAES512)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-		fmt.Println(res)
-	},
-}
-
 func init() {
 	genCmd.AddCommand(genAES128Cmd)
 	genCmd.AddCommand(genAES256Cmd)
-	genCmd.AddCommand(genAES512Cmd)
 }
 
 // genRandomString generates a random string of length n

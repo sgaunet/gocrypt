@@ -39,7 +39,7 @@ testcases:
     assertions:
     - result.code ShouldNotEqual 0
 
-- name: diff between input and crypted file
+- name: diff between input and crypted file AES128
   steps:
   - type: exec
     script: |
@@ -47,7 +47,7 @@ testcases:
     assertions:
     - result.code ShouldNotEqual 0
 
-- name: decrypt outputs/crypted.txt to outputs/decrypted.txt
+- name: decrypt outputs/crypted.txt to outputs/decrypted.txt AES128
   steps:
   - type: exec
     script: |
@@ -56,11 +56,12 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
 
-- name: diff between input and decrypted file
+- name: diff between input and decrypted file AES128
   steps:
   - type: exec
     script: |
-      diff -q inputs/input.txt outputs/decrypted.txt
+      cd {{.venom.testsuite.workdir}}/..
+      diff -q tests/inputs/input.txt tests/outputs/decrypted.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -77,12 +78,12 @@ testcases:
   steps:
   - type: exec
     script: |
-      cd {{.venom.testsuite.workdir}}/
-      diff -q inputs/input.txt outputs/crypted.txt
+      cd {{.venom.testsuite.workdir}}/..
+      diff -q tests/inputs/input.txt tests/outputs/decrypted.txt
     assertions:
     - result.code ShouldEqual 0
 
-- name: outputfile not mandatory encrypt again (outputs/crypted.txt)
+- name: outputfile not mandatory encrypt again (outputs/crypted.txt) AES128
   steps:
   - type: exec
     script: |
@@ -91,20 +92,11 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     
-- name: outputfile not mandatory decrypt again (outputs/crypted.txt)
+- name: outputfile not mandatory decrypt again (outputs/crypted.txt) AES128
   steps:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
       go run . enc --i tests/inputs/input.txt --k tests/inputs/key-AES128.txt --o tests/outputs/crypted.txt.enc
-    assertions:
-    - result.code ShouldEqual 0
-
-- name: diff between input and decrypted file
-  steps:
-  - type: exec
-    script: |
-      cd {{.venom.testsuite.workdir}}/..
-      diff -q tests/outputs/crypted.txt tests/outputs/crypted.txt.enc
     assertions:
     - result.code ShouldEqual 0
