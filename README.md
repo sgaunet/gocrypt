@@ -14,6 +14,17 @@ gocrypt is a simple and efficient command line tool to encrypt and decrypt files
 - Easy integration in scripts and automation
 - Cross-platform: works on Linux, macOS, and Windows
 
+## Version Compatibility
+
+⚠️ **Important Breaking Change** ⚠️
+
+Version 2 (v2) introduced AES GCM (Galois/Counter Mode) encryption, which breaks compatibility with files encrypted using version 1 (v1).
+
+- Files encrypted with v1 **cannot** be decrypted with v2
+- Files encrypted with v2 **cannot** be decrypted with v1
+
+This incompatibility is due to the fundamental change in the encryption mode from v1 to v2. AES GCM provides better security with authenticated encryption but requires a different format that is not backwards compatible.
+
 ## Usage
 
 ```sh
