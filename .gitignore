@@ -6,3 +6,4 @@ tests/inputs/BIG
 dist
 log
 /gocrypt
+/.devbox
