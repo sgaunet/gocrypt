@@ -3,6 +3,8 @@ package aes
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -16,98 +18,118 @@ import (
 const KeyLenAES128 = 16
 
 // KeyLenAES256 is the length of the key for AES256
-const KeyLenAES256 = 24
+const KeyLenAES256 = 32
 
-// KeyLenAES512 is the length of the key for AES512
-const KeyLenAES512 = 32
-
-// GetKey returns the key from the file or from the environment variable
-func GetKey(keyFilename string) (key []byte, err error) {
-	keyFromEnv := os.Getenv("GOCRYPT_KEY")
-	keyFromFile, err := getKeyFromFile(keyFilename)
-	if err != nil {
-		key = []byte(keyFromEnv)
-	}
-	if err == nil {
-		key = keyFromFile
-	}
-	if len(key) == 0 {
-		return nil, errors.New("key is empty or not set")
-	}
-	return key, nil
-}
-
-func getKeyFromFile(keyFilename string) ([]byte, error) {
+// GetKeyFromFile reads a key from the specified file, trims carriage returns and newlines,
+// and checks that the key length is valid for AES-128 (16 bytes) or AES-256 (32 bytes).
+// Returns the key as a byte slice or an error if the key is invalid or the file cannot be read.
+func GetKeyFromFile(keyFilename string) ([]byte, error) {
 	key, err := os.ReadFile(keyFilename)
 	if err != nil {
 		return nil, err
 	}
 	keyWithoutCR := strings.Trim(string(key), "\r\n")
 
-	if len(keyWithoutCR) != KeyLenAES128 && len(keyWithoutCR) != KeyLenAES256 && len(keyWithoutCR) != KeyLenAES512 {
-		errMsg := fmt.Sprintf("length of key should be %d (AES128), %d (AES256) or %d (AES512)", KeyLenAES128, KeyLenAES256, KeyLenAES512)
+	if len(keyWithoutCR) != KeyLenAES128 && len(keyWithoutCR) != KeyLenAES256 {
+		errMsg := fmt.Sprintf("length of key should be %d (AES128), %d (AES256)", KeyLenAES128, KeyLenAES256)
 		return nil, errors.New(errMsg)
 	}
 
 	return []byte(keyWithoutCR), err
 }
 
-// EncryptFile encrypts a file
-func EncryptFile(key []byte, inputFile, outputFile string) error {
-	// Creating block of algorithm
+// EncryptFile encrypts data from the provided io.Reader and writes the encrypted output to the provided io.Writer.
+// Each chunk is encrypted and authenticated independently with its own random nonce and tag.
+func EncryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err
 	}
-	reader, err := os.Open(inputFile)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
 
-	writer, err := os.Create(outputFile)
-	if err != nil {
-		return err
-	}
-	defer writer.Close()
-
-	iv := make([]byte, aes.BlockSize)
-	stream := cipher.NewOFB(block, iv)
-	cipherWriter := &cipher.StreamWriter{
-		S: stream,
-		W: writer,
-	}
-	if _, err = io.Copy(cipherWriter, reader); err != nil {
-		return err
+	const chunkSize = 32 * 1024 // 32KB
+	buf := make([]byte, chunkSize)
+	for {
+		n, readErr := io.ReadFull(reader, buf)
+		if n > 0 {
+			plaintext := buf[:n]
+			nonce := make([]byte, gcm.NonceSize())
+			if _, err := rand.Read(nonce); err != nil {
+				return err
+			}
+			ciphertext := gcm.Seal(nil, nonce, plaintext, nil)
+			// Write chunk length (uint32, big endian)
+			var chunkLen [4]byte
+			binary.BigEndian.PutUint32(chunkLen[:], uint32(n))
+			if _, err := writer.Write(chunkLen[:]); err != nil {
+				return err
+			}
+			// Write nonce
+			if _, err := writer.Write(nonce); err != nil {
+				return err
+			}
+			// Write ciphertext (includes tag)
+			if _, err := writer.Write(ciphertext); err != nil {
+				return err
+			}
+		}
+		if readErr == io.EOF {
+			break
+		}
+		if readErr == io.ErrUnexpectedEOF {
+			break
+		}
+		if readErr != nil {
+			return readErr
+		}
 	}
 	return nil
 }
 
-// DecryptFile decrypts a file
-func DecryptFile(key []byte, inputFile, outputFile string) error {
-	// Creating block of algorithm
+// DecryptFile decrypts data from the provided io.Reader and writes the decrypted output to the provided io.Writer.
+// Each chunk is decrypted and authenticated independently.
+func DecryptFile(key []byte, reader io.Reader, writer io.Writer) error {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return errors.New("cipher err: " + err.Error())
 	}
-	reader, err := os.Open(inputFile)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
 
-	f, err := os.Create(outputFile)
-	if err != nil {
-		return err
+	const nonceSize = 12 // GCM standard
+	const tagSize = 16   // GCM standard
+	for {
+		var chunkLenBuf [4]byte
+		_, err := io.ReadFull(reader, chunkLenBuf[:])
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		chunkLen := binary.BigEndian.Uint32(chunkLenBuf[:])
+		// Read nonce
+		nonce := make([]byte, nonceSize)
+		if _, err := io.ReadFull(reader, nonce); err != nil {
+			return err
+		}
+		// Read ciphertext (chunkLen + tagSize)
+		ciphertext := make([]byte, chunkLen+uint32(tagSize))
+		if _, err := io.ReadFull(reader, ciphertext); err != nil {
+			return err
+		}
+		plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+		if err != nil {
+			return err
+		}
+		if _, err := writer.Write(plaintext); err != nil {
+			return err
+		}
 	}
-	defer f.Close()
-
-	iv := make([]byte, aes.BlockSize)
-	stream := cipher.NewOFB(block, iv)
-	cipherReader := &cipher.StreamReader{S: stream, R: reader}
-	if _, err = io.Copy(f, cipherReader); err != nil {
-		return err
-	}
-
 	return nil
 }

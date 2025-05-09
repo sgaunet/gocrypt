@@ -6,21 +6,38 @@
 
 # Gocrypt
 
-gocrypt is a command line tool to encrypt/decrypt file in AES128/256/512.
+gocrypt is a simple and efficient command line tool to encrypt and decrypt files using AES-128 or AES-256 encryption.
 
-Usage is quite simple :
+## Features
+- Encrypt and decrypt files using AES-128 or AES-256 (GCM mode)
+- Key can be provided via a file or the `GOCRYPT_KEY` environment variable
+- Easy integration in scripts and automation
+- Cross-platform: works on Linux, macOS, and Windows
 
-```
+## Version Compatibility
+
+⚠️ **Important Breaking Change** ⚠️
+
+Version 2 (v2) introduced AES GCM (Galois/Counter Mode) encryption, which breaks compatibility with files encrypted using version 1 (v1).
+
+- Files encrypted with v1 **cannot** be decrypted with v2
+- Files encrypted with v2 **cannot** be decrypted with v1
+
+This incompatibility is due to the fundamental change in the encryption mode from v1 to v2. AES GCM provides better security with authenticated encryption but requires a different format that is not backwards compatible.
+
+## Usage
+
+```sh
 $ gocrypt help
-Tool to encrypt/decrypt file in AES128/256/512.
+Tool to encrypt/decrypt files using AES128 or AES256.
 
 Usage:
   gocrypt [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
-  dec         decrypt file in AES 128/256/512
-  enc         encrypt file in AES 128/256/512
+  dec         decrypt file in AES 128/256
+  enc         encrypt file in AES 128/256
   help        Help about any command
   version     print version of gocrypt
 
@@ -30,26 +47,42 @@ Flags:
 Use "gocrypt [command] --help" for more information about a command.
 ```
 
-Here is a little demo:
+### Example
+
+```sh
+# Encrypt a file with a 32-byte key (AES-256)
+gocrypt enc --i input.txt --o encrypted.bin --k keyfile.txt
+
+# Decrypt a file
+gocrypt dec --i encrypted.bin --o decrypted.txt --k keyfile.txt
+```
+
+### Key Format
+- For AES-128, the key must be exactly 16 bytes (characters)
+- For AES-256, the key must be exactly 32 bytes (characters)
+- The key can be provided in a file or via the `GOCRYPT_KEY` environment variable
+
+## Demo
 
 ![Demo](doc/demo.gif)
 
-Even if I still maintain this little tool, you should rather consider to use [age](https://github.com/FiloSottile/age) which is a more complete and secure tool.
+## Recommendation
+Even though this tool is maintained, for most use-cases you should consider using [age](https://github.com/FiloSottile/age) which is a more modern and secure encryption tool.
 
 # Install
 
-Download the binary in the release section. There is no docker image, but you can install a binary in your Docker image if needed. If you want to create a docker image from scratch, you will need to do a multi stage docker build in order to download the binary.
+Download the binary from the [releases section](https://github.com/sgaunet/gocrypt/releases/latest). There is no official Docker image, but you can add the binary to your own Docker image if needed.
 
-## With homebrew
+## With Homebrew
 
-```
+```sh
 brew tap sgaunet/homebrew-tools
 brew install sgaunet/tools/gocrypt
 ```
 
-## Use it in your own Docker image
+## Use in Docker
 
-```
+```Dockerfile
 FROM sgaunet/gocrypt:latest as gocrypt
 
 FROM alpine:latest
@@ -59,47 +92,12 @@ COPY --from=gocrypt /gocrypt /usr/local/bin/gocrypt
 
 # Tests
 
-Tests are done with [venom](https://github.com/ovh/venom).
+The project includes automated tests for both small and large files. See the `tests/` directory for details.
 
 ```
-cd tests
-venom run
+task tests
 ```
 
-# Development
+# License
 
-This project is using :
-
-* golang
-* [task for development](https://taskfile.dev/#/)
-* docker
-* [docker buildx](https://github.com/docker/buildx)
-* docker manifest
-* [goreleaser](https://goreleaser.com/)
-* [venom](https://github.com/ovh/venom) : Tests
-* [pre-commit](https://pre-commit.com/)
-
-There are hooks executed in the precommit stage. Once the project cloned on your disk, please install pre-commit:
-
-```
-brew install pre-commit
-```
-
-Install tools:
-
-```
-task dev:install-prereq
-```
-
-And install the hooks:
-
-```
-task dev:install-pre-commit
-```
-
-If you like to launch manually the pre-commmit hook:
-
-```
-task dev:pre-commit
-```
-
+MIT License

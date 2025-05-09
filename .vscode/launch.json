@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch file",
+            "name": "AES256",
             "type": "go",
             "request": "launch",
             "mode": "auto",
@@ -13,7 +13,7 @@
             // "env": {
             //     "KUBECONFIG": "/home/sylvain/.kube/kubeconfig-admin@DEV"
             // },
-            "args": ["-e" ,"-i","${workspaceFolder}/tests/inputs/input.txt","-o","${workspaceFolder}/tests/outputs/crypted-AES512.txt","-k","${workspaceFolder}/tests/inputs/key-AES512.txt" ]
+            "args": ["enc" ,"--i","${workspaceFolder}/tests/inputs/input.txt","--o","${workspaceFolder}/tests/outputs/crypted-AES256.txt","--k","${workspaceFolder}/tests/inputs/key-AES256.txt" ]
         }
     ]
 }

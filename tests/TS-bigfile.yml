@@ -14,7 +14,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . enc --i tests/inputs/BIG --o tests/outputs/crypted-BIG-AES512.txt  --k tests/inputs/key-AES512.txt
+      go run . enc --i tests/inputs/BIG --o tests/outputs/crypted-BIG-AES256.txt  --k tests/inputs/key-AES256.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -22,7 +22,7 @@ testcases:
   steps:
   - type: exec
     script: |
-      diff -q tests/inputs/BIG tests/outputs/crypted-BIG-AES512.txt
+      diff -q tests/inputs/BIG tests/outputs/crypted-BIG-AES256.txt
     assertions:
     - result.code ShouldNotEqual 0
 
@@ -31,7 +31,7 @@ testcases:
   - type: exec
     script: |
       cd {{.venom.testsuite.workdir}}/..
-      go run . dec --i tests/outputs/crypted-BIG-AES512.txt --o tests/outputs/decrypted-BIG-AES512.txt  --k tests/inputs/key-AES512.txt
+      go run . dec --i tests/outputs/crypted-BIG-AES256.txt --o tests/outputs/decrypted-BIG-AES256.txt  --k tests/inputs/key-AES256.txt
     assertions:
     - result.code ShouldEqual 0
 
@@ -39,6 +39,6 @@ testcases:
   steps:
   - type: exec
     script: |
-      diff -q inputs/BIG outputs/decrypted-BIG-AES512.txt
+      diff -q inputs/BIG outputs/decrypted-BIG-AES256.txt
     assertions:
     - result.code ShouldEqual 0
