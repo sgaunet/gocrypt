@@ -10,7 +10,7 @@ var inputFile, outputFile string
 var keyFile string
 var rmOption bool
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "gocrypt",
 	Short: "Tool to encrypt/decrypt file in AES128/256.",

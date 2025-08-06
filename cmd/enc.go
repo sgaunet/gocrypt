@@ -8,12 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// setCmd represents the set command
+// encCmd represents the encryption command.
 var encCmd = &cobra.Command{
 	Use:   "enc",
 	Short: "encrypt file in AES 128/256",
 	Long:  `encrypt file in AES 128/256`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		var (
 			tmpFile               *os.File
 			overwriteOriginalFile bool
@@ -40,7 +40,7 @@ var encCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			outputFile = tmpFile.Name()
-			tmpFile.Close()
+			_ = tmpFile.Close()
 		}
 
 		if isFileExists(outputFile) && !overwriteOriginalFile {
@@ -67,13 +67,13 @@ var encCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Cannot open input file: %v\n", err)
 			os.Exit(1)
 		}
-		defer inF.Close()
+		defer func() { _ = inF.Close() }()
 		outF, err := os.Create(outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot create output file: %v\n", err)
 			os.Exit(1)
 		}
-		defer outF.Close()
+		defer func() { _ = outF.Close() }()
 
 		err = aes.EncryptFile(key, inF, outF)
 		if err != nil {

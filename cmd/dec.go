@@ -1,3 +1,4 @@
+// Package cmd contains the command-line interface for gocrypt.
 package cmd
 
 import (
@@ -8,12 +9,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// setCmd represents the set command
+// setCmd represents the set command.
 var decCmd = &cobra.Command{
 	Use:   "dec",
 	Short: "decrypt file in AES 128/256",
 	Long:  `decrypt file in AES 128/256`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		var (
 			tmpFile               *os.File
 			overwriteOriginalFile bool
@@ -40,7 +41,7 @@ var decCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			outputFile = tmpFile.Name()
-			tmpFile.Close()
+			_ = tmpFile.Close()
 		}
 
 		if isFileExists(outputFile) && !overwriteOriginalFile {
@@ -67,13 +68,13 @@ var decCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Cannot open input file: %v\n", err)
 			os.Exit(1)
 		}
-		defer inF.Close()
+		defer func() { _ = inF.Close() }()
 		outF, err := os.Create(outputFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot create output file: %v\n", err)
 			os.Exit(1)
 		}
-		defer outF.Close()
+		defer func() { _ = outF.Close() }()
 
 		err = aes.DecryptFile(key, inF, outF)
 		if err != nil {

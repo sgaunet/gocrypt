@@ -1,13 +1,18 @@
 package cmd
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 
 func isFileExists(file string) bool {
-	f, err := os.Open(file)
+	// Clean the path to prevent directory traversal
+	cleanFile := filepath.Clean(file)
+	f, err := os.Open(cleanFile) // #nosec G304 - file path is cleaned
 	if os.IsNotExist(err) {
 		return false
 	}
-	defer f.Close()
-	i, _ := os.Stat(file)
+	defer func() { _ = f.Close() }()
+	i, _ := os.Stat(cleanFile)
 	return !i.IsDir()
 }

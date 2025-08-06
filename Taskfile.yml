@@ -13,10 +13,10 @@ tasks:
     cmds:
       - task -a
 
-  lint:
+  linter:
     desc: "Run linter"
     cmds:
-      - golangci-lint run -c .github/linters/.golangci.yml
+      - golangci-lint run
   
 
   binary:
