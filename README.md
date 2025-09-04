@@ -2,6 +2,10 @@
 [![GitHub release](https://img.shields.io/github/release/sgaunet/gocrypt.svg)](https://github.com/sgaunet/gocrypt/releases/latest)
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/gocrypt/total)
 ![Coverage Badge](https://raw.githubusercontent.com/wiki/sgaunet/gocrypt/coverage-badge.svg)
+[![linter](https://github.com/sgaunet/gocrypt/actions/workflows/coverage.yml/badge.svg)](https://github.com/sgaunet/gocrypt/actions/workflows/coverage.yml)
+[![coverage](https://github.com/sgaunet/gocrypt/actions/workflows/coverage.yml/badge.svg)](https://github.com/sgaunet/gocrypt/actions/workflows/coverage.yml)
+[![Snapshot Build](https://github.com/sgaunet/gocrypt/actions/workflows/snapshot.yml/badge.svg)](https://github.com/sgaunet/gocrypt/actions/workflows/snapshot.yml)
+[![Release Build](https://github.com/sgaunet/gocrypt/actions/workflows/release.yml/badge.svg)](https://github.com/sgaunet/gocrypt/actions/workflows/release.yml)
 [![GoDoc](https://godoc.org/github.com/sgaunet/gocrypt?status.svg)](https://godoc.org/github.com/sgaunet/gocrypt)
 [![License](https://img.shields.io/github/license/sgaunet/gocrypt.svg)](LICENSE)
 
