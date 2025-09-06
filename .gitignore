@@ -3,7 +3,6 @@ tests/outputs/*.txt
 tests/outputs/*.enc
 tests/outputs/*.ori
 tests/inputs/BIG
-dist
+/dist
 log
 /gocrypt
-/.devbox
