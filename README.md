@@ -1,4 +1,3 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/gocrypt)](https://goreportcard.com/report/github.com/sgaunet/gocrypt)
 [![GitHub release](https://img.shields.io/github/release/sgaunet/gocrypt.svg)](https://github.com/sgaunet/gocrypt/releases/latest)
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/gocrypt/total)
 ![Coverage Badge](https://raw.githubusercontent.com/wiki/sgaunet/gocrypt/coverage-badge.svg)
